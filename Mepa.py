@@ -21,14 +21,14 @@ class Lex():
             ('COMMENT', r'(?://[A-Za-z0-9_]+\n)|(#.*?\n)'),  # comentario com // ou #
             ('NUMBER', r'\d+(\.\d*)?'),  # Integer or decimal number
             ('ASSIGN', r':='),  # Assignment operator
-            ('END', r';'),  # Statement terminator
+            ('ENDLINE', r';'),  # Statement terminator
             ('ID', r'[A-Za-z0-9_]+'),  # Identifiers
             ('OP', r'[+\-*/%]'),  # Arithmetic operators
             ('NEWLINE', r'\n'),  # Line endings
             ('SKIP', r'[ \t\r\n]+'),  # Skip over spaces and tabs
             ('MISMATCH', r'./'),  # Any other character
             ('STRING', r'(".*?")'),
-            ('SPECIAL', r'[<>(){}.,\[\]]'),
+            ('SPECIAL', r'[<>(){}.,\[\]]='),
         ]
         tok_regex = '|'.join('(?P<%s>%s)' % pair for pair in token_specification)
         line_num = 1
@@ -51,20 +51,8 @@ class Lex():
                 # yield self.Token(kind, value, line_num, column)
         return list
 
-    """
-    tokens = deque()
-    tipos = deque()
-    for token in tokenize():
-        tipos.append(token.typ)
-        tokens.append(token.value)
-    tokens.append('$')
 
-    print(tokens)
-    print(tipos)
-    """
-
-
-###############################################################################
+#########################  TRANSLATOR  ######################################################
 class Translator():
     def __init__(self):
         self.var = {}
@@ -72,8 +60,8 @@ class Translator():
         self.tok = None
         self.text = ""
 
-    def translate(self, tokens):
-        i = 0
+    def translate(self, tokens, int):
+        i = int
         self.tokens = tokens
         size = len(tokens)
         while i < size:
@@ -82,11 +70,34 @@ class Translator():
             elif self.tokens[i].typ == 'VAR':
                 i = self.AMEM(i + 1)
             elif self.tokens[i].typ == 'READ':
-                self.LEIT(i + 2)
-                i += 4
-            elif self.tokens[i].typ == 'ID':
+                self.LEIT(i)
+                i += 2
+            elif (self.tokens[i].typ == 'ID'):
+                if(self.tokens[i+1].typ == 'ASSIGN') and (self.tokens[i+2].typ == 'NUMBER') and (self.tokens[i+3].typ == 'ENDLINE'):
+                    self.CRCTI(i)
+                    i += 3
+                elif(self.tokens[i+1].typ == 'ASSIGN') and (self.tokens[i+2].typ == 'ID') and (self.tokens[i+3].typ == 'ENDLINE'):
+                    self.CRVL(i+2)
+                    self.ARMZ(i)
+            #todo
 
-                pass
+
+            elif self.tokens[i].typ == 'WHILE':
+                self.NADA(tokens, i)
+                i += 1
+                self.CRVL(i)
+                i += 1
+                self.CRVL(i+1)
+                if self.tokens[i].value == '<=':
+                    self.CompOp(tokens[i].value)
+                i += 4
+                aux = i
+                self.DSVF(i)
+                self.translate(tokens, i)
+
+
+
+            pass
 
 
             i += 1
@@ -112,10 +123,52 @@ class Translator():
 
     def LEIT(self, index):
         self.code.append("LEIT\n")
+        self.ARMZ(index+1)
+
+    def CRCTI(self, index):
+        self.code.append("CRTC " + self.tokens[index+2].value + '\n')
         self.code.append("ARMZ " + self.tokens[index].value + '\n')
 
+    def CRVL(self, index):
+        self.code.append("CRVL " + self.tokens[index].value + '\n')
 
-###############################################################################
+    def ARMZ(self, index):
+        self.code.append("ARMZ " + self.tokens[index].value + '\n')
+
+    def CMME(self):
+        self.code.append("CMME \n")
+    def CMMA(self):
+        self.code.append("CMMA \n")
+    def CMIG(self):
+        self.code.append("CMIG \n")
+    def CMDG(self):
+        self.code.append("CMDG \n")
+    def CMEG(self):
+        self.code.append("CMEG \n")
+    def CMAG(self):
+        self.code.append("CMAG \n")
+    def DSVF(self,index):
+        self.code.append("DSVF L" + str(index) + '\n')
+
+    def NADA(self, toke, index):
+        aux = index
+        self.code.append("L" + str(index) + "  NADA\n")
+
+    def CompOp(self, op):
+        if op == '<':
+            self.CMME()
+        elif op == '>':
+            self.CMMA()
+        elif op == '==':
+            self.CMIG()
+        elif op == '!=':
+            self.CMDG()
+        elif op == '<=':
+            self.CMEG()
+        elif op == '>=':
+            self.CMAG()
+
+##############################    MEPA     #################################################
 class Mepa():
     def __init__(self):
         self.S = 0  # Ponteiro da pilha M
@@ -140,9 +193,7 @@ if __name__ == "__main__":
     mepa = Mepa()
     toke = lexico.tokenize(code)
 
-    mepa.CRCT(9)
-
-    texto = tradutor.translate(toke)
+    texto = tradutor.translate(toke, 0)
     print(texto)
 
     arq = open("traducao.txt", "w")
