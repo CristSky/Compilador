@@ -7,7 +7,7 @@ import re
 from collections import deque
 
 
-###############################################################################
+#################################      LEXICO    ##############################################
 class Lex():
     def __init__(self, statements=None):
         self.Token = collections.namedtuple('Token', ['typ', 'value', 'line', 'column'])
@@ -79,11 +79,21 @@ class Translator():
                 elif(self.tokens[i+1].typ == 'ASSIGN') and (self.tokens[i+2].typ == 'ID') and (self.tokens[i+3].typ == 'ENDLINE'):
                     self.CRVL(i+2)
                     self.ARMZ(i)
+                elif(self.tokens[i+1].typ == 'ASSIGN') and (self.tokens[i+2].typ == 'NUMBER') and (self.tokens[i+3].typ == 'ENDLINE'):
+                    self.CRCTI(i+2)
+                    self.ARMZ(i)
+
+                elif(self.tokens[i+1].typ == 'ASSIGN'):
+                    self.NotPolonesa(tokens, i+2)
+                    self.ARMZ(i)
+
             #todo
 
 
+
             elif self.tokens[i].typ == 'WHILE':
-                self.NADA(tokens, i)
+                self.NADA(i)
+                back = i
                 i += 1
                 self.CRVL(i)
                 i += 1
@@ -91,10 +101,23 @@ class Translator():
                 if self.tokens[i].value == '<=':
                     self.CompOp(tokens[i].value)
                 i += 4
+                tmp = i
+                stop = 1
+                #Verifica para onde o while acaba
+                while stop != 0:
+                    if tokens[tmp].typ == 'WHILE':
+                        stop += 1
+                    elif tokens[tmp].typ == 'END':
+                        stop -= 1
+                    else:
+                        tmp += 1
+
                 aux = i
                 self.DSVF(i)
                 self.translate(tokens, i)
-
+                self.DSVS(back)
+                self.NADA(aux)
+                i = tmp
 
 
             pass
@@ -149,9 +172,10 @@ class Translator():
         self.code.append("CMAG \n")
     def DSVF(self,index):
         self.code.append("DSVF L" + str(index) + '\n')
+    def DSVS(self,index):
+        self.code.append("DSVS L" + str(index) + '\n')
 
-    def NADA(self, toke, index):
-        aux = index
+    def NADA(self, index):
         self.code.append("L" + str(index) + "  NADA\n")
 
     def CompOp(self, op):
@@ -168,6 +192,45 @@ class Translator():
         elif op == '>=':
             self.CMAG()
 
+    def NotPolonesa(self, tokens, index):
+        pilha = []
+        print("entrou")
+        print(tokens[index])
+        while tokens[index].typ != 'ENDLINE':
+            if tokens[index].value == '(':
+                pilha.append(tokens[index].value)
+                index += 1
+            elif tokens[index].value == ')':
+                while pilha[len(pilha-1)] != '(':
+                    code.append(pilha.pop())
+                print(pilha.pop())
+                index += 1
+            elif tokens[index].typ == 'ID':
+                self.CRVL(index)
+                index += 1
+            elif tokens[index].typ == 'NUMBER':
+                self.CRCTI(index)
+                index += 1
+            elif tokens[index].value == '+':
+                pilha.append("SOMA \n")
+                index += 1
+            elif tokens[index].value == '-':
+                pilha.append("SUBT \n")
+                index += 1
+            elif tokens[index].value == '*':
+                if tokens[index+1].typ == 'ID':
+                    self.CRVL(index+1)
+                elif tokens[index+1].typ == 'NUMBER':
+                    self.CRCTI(index+1)
+                self.code.append("MULT \n")
+                index += 2
+            elif tokens[index].value == '/':
+                if tokens[index+1].typ == 'ID':
+                    self.CRVL(index+1)
+                elif tokens[index+1].typ == 'NUMBER':
+                    self.CRCTI(index+1)
+                self.code.append("DIVI \n")
+                index += 2
 ##############################    MEPA     #################################################
 class Mepa():
     def __init__(self):
@@ -199,25 +262,3 @@ if __name__ == "__main__":
     arq = open("traducao.txt", "w")
     arq.writelines(texto)
     arq.close()
-
-"""
-PROGRAM TESTE;
-	VAR N, K : INTEGER;
-	VAR F1, F2, F3 : INTEGER;
-BEGIN
-	READ(N);
-	F1:=0;
-	F2:=1;
-	K:=1;
-
-	WHILE K <= N DO
-	BEGIN
-		F3 := F1 + F2;
-		F1 := F2;
-		F2 := F3;
-		K := K + 1;
-	END;
-
-	WRITE(N, F1);
-END;
-"""
