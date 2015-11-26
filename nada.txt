@@ -66,7 +66,8 @@ Token(typ='NUMBER', value='1', line=15, column=11)
 Token(typ='END', value=';', line=15, column=12)
 Token(typ='END', value='END', line=16, column=1)
 Token(typ='END', value=';', line=16, column=4)
-Token(typ='ID', value='WRITE', line=18, column=1)
+
+Token(typ='WRITE', value='WRITE', line=18, column=1)
 Token(typ='SPECIAL', value='(', line=18, column=6)
 Token(typ='ID', value='N', line=18, column=7)
 Token(typ='SPECIAL', value=',', line=18, column=8)
@@ -86,6 +87,9 @@ Token(typ='END', value=';', line=1, column=5)
 
 
 
+ if self.tokens[i].typ == 'IF':
+                i += 1
+                if self.tokens[i].typ == 'ID':
 
 
 
