@@ -77,7 +77,7 @@ class Translator():
         self.tokens = tokens
         size = len(tokens)
         while (i < size):
-            if  (i == e):
+            if (i == e):
                 break
             if self.tokens[i].typ == "PROGRAM":
                 self.INPP()
@@ -86,7 +86,7 @@ class Translator():
                 i = self.AMEM(i + 1)
             elif self.tokens[i].typ == 'READ':
                 i += 2
-                while(tokens[i].typ != 'FEPAR'):
+                while (tokens[i].typ != 'FEPAR'):
                     self.LEIT(i)
                     i += 1
                     if (tokens[i].typ == 'VIR'):
@@ -105,13 +105,14 @@ class Translator():
                 z = 0
 
                 while z <= con:
-                    if (tokens[i].typ == 'ID') and ((tokens[i+1].typ == 'VIR')or (tokens[i+1].typ == 'FEPAR')):
+                    if (tokens[i].typ == 'ID') and ((tokens[i + 1].typ == 'VIR') or (tokens[i + 1].typ == 'FEPAR')):
                         self.CRVL(i)
                         i += 2
-                    elif (tokens[i].typ == 'NUMBER') and ((tokens[i+1].typ == 'VIR') or (tokens[i+1].typ == 'FEPAR')):
+                    elif (tokens[i].typ == 'NUMBER') and (
+                        (tokens[i + 1].typ == 'VIR') or (tokens[i + 1].typ == 'FEPAR')):
                         self.CRCTI(i)
                         i += 2
-                    elif (tokens[i+1].typ == 'OP'):
+                    elif (tokens[i + 1].typ == 'OP'):
                         self.NotPolonesa(tokens, i)
                         while (tokens[i].typ != 'VIR') and (tokens[i].typ != 'FEPAR'):
                             i += 1
@@ -121,50 +122,54 @@ class Translator():
                     z += 1
 
             elif self.tokens[i].typ == 'ID':
-                if(self.tokens[i+1].typ == 'ASSIGN') and (self.tokens[i+2].typ == 'NUMBER') and (self.tokens[i+3].typ == 'ENDLINE'):
-                    self.CRCTI(i+2)
+                if (self.tokens[i + 1].typ == 'ASSIGN') and (self.tokens[i + 2].typ == 'NUMBER') and (
+                    self.tokens[i + 3].typ == 'ENDLINE'):
+                    self.CRCTI(i + 2)
                     self.ARMZ(i)
                     i += 3
-                elif(self.tokens[i+1].typ == 'ASSIGN') and (self.tokens[i+2].typ == 'ID') and (self.tokens[i+3].typ == 'ENDLINE'):
-                    self.CRVL(i+2)
+                elif (self.tokens[i + 1].typ == 'ASSIGN') and (self.tokens[i + 2].typ == 'ID') and (
+                    self.tokens[i + 3].typ == 'ENDLINE'):
+                    self.CRVL(i + 2)
                     self.ARMZ(i)
                     i += 3
-                elif(self.tokens[i+1].typ == 'ASSIGN'):
-                    self.NotPolonesa(tokens, i+2)
+                elif (self.tokens[i + 1].typ == 'ASSIGN'):
+                    self.NotPolonesa(tokens, i + 2)
                     self.ARMZ(i)
                     i = self.counter(tokens, i)
-                elif(self.tokens[i+1].typ == 'OP'):
+                elif (self.tokens[i + 1].typ == 'OP'):
                     self.NotPolonesa(tokens, i)
                     i = self.counter(tokens, i)
                 else:
                     self.CRVL(i)
 
-            #todo if
+            # todo if
             elif self.tokens[i].typ == 'IF':
                 int1 = i
                 i += 1
                 while self.tokens[i].typ != 'THEN':
-                    if (self.tokens[i].typ == 'ID') and (self.tokens[i+2].typ == 'ID') :
+                    if (self.tokens[i].typ == 'ID') and (self.tokens[i + 2].typ == 'ID'):
                         self.CRVL(i)
-                        self.CRVL(i+2)
+                        self.CRVL(i + 2)
                         i += 1
-                    elif (self.tokens[i].typ == 'ID') and (self.tokens[i+2].typ == 'NUMBER'):
+                    elif (self.tokens[i].typ == 'ID') and (self.tokens[i + 2].typ == 'NUMBER'):
                         self.CRVL(i)
-                        self.CRCTI(i+2)
+                        self.CRCTI(i + 2)
                         i += 1
-                    elif (self.tokens[i].typ == 'NUMBER') and (self.tokens[i+2].typ == 'ID'):
+                    elif (self.tokens[i].typ == 'NUMBER') and (self.tokens[i + 2].typ == 'ID'):
                         self.CRCTI(i)
-                        self.CRVL(i+2)
+                        self.CRVL(i + 2)
                         i += 1
-                    elif (self.tokens[i].typ == 'NUMBER') and (self.tokens[i+2].typ == 'NUMBER'):
+                    elif (self.tokens[i].typ == 'NUMBER') and (self.tokens[i + 2].typ == 'NUMBER'):
                         self.CRCTI(i)
-                        self.CRCTI(i+2)
+                        self.CRCTI(i + 2)
                         i += 1
-                    elif (self.tokens[i].typ == 'MEIG') or (self.tokens[i].typ == 'MAIG') or (self.tokens[i].typ == 'IG') or (self.tokens[i].typ == 'DI') or (self.tokens[i].typ == 'ME') or (self.tokens[i].typ == 'MA'):
+                    elif (self.tokens[i].typ == 'MEIG') or (self.tokens[i].typ == 'MAIG') or (
+                        self.tokens[i].typ == 'IG') or (self.tokens[i].typ == 'DI') or (self.tokens[i].typ == 'ME') or (
+                        self.tokens[i].typ == 'MA'):
                         self.CompOp(tokens[i].value)
                         i += 2
                         self.DSVF(int1)
-                #pega o index do else
+                # pega o index do else
                 aux = i
                 while tokens[aux].typ != 'ELSE':
                     aux += 1
@@ -187,13 +192,14 @@ class Translator():
                 i += 1
                 self.CRVL(i)
                 i += 1
-                self.CRVL(i+1)
-                if (self.tokens[i].typ == 'MEIG') or (self.tokens[i].typ == 'MAIG') or (self.tokens[i].typ == 'IG') or (self.tokens[i].typ == 'DI') or (self.tokens[i].typ == 'ME') or (self.tokens[i].typ == 'MA'):
+                self.CRVL(i + 1)
+                if (self.tokens[i].typ == 'MEIG') or (self.tokens[i].typ == 'MAIG') or (self.tokens[i].typ == 'IG') or (
+                    self.tokens[i].typ == 'DI') or (self.tokens[i].typ == 'ME') or (self.tokens[i].typ == 'MA'):
                     self.CompOp(tokens[i].value)
                 i += 4
                 tmp = i
                 stop = 1
-                #Verifica para onde o while acaba
+                # Verifica para onde o while acaba
                 while stop != 0:
                     if tokens[tmp].typ == 'WHILE':
                         stop += 1
@@ -232,6 +238,7 @@ class Translator():
             i += 1
         self.code.append('AMEM ' + str(self.qtdevar) + "\n")
         return i
+
     def DMEM(self):
         self.code.append('DMEM ' + str(self.qtdevar) + "\n")
 
@@ -253,19 +260,26 @@ class Translator():
 
     def CMME(self):
         self.code.append("CMME \n")
+
     def CMMA(self):
         self.code.append("CMMA \n")
+
     def CMIG(self):
         self.code.append("CMIG \n")
+
     def CMDG(self):
         self.code.append("CMDG \n")
+
     def CMEG(self):
         self.code.append("CMEG \n")
+
     def CMAG(self):
         self.code.append("CMAG \n")
-    def DSVF(self,index):
+
+    def DSVF(self, index):
         self.code.append("DSVF L" + str(index) + '\n')
-    def DSVS(self,index):
+
+    def DSVS(self, index):
         self.code.append("DSVS L" + str(index) + '\n')
 
     def NADA(self, index):
@@ -316,23 +330,24 @@ class Translator():
                 pilha.append("SUBT \n")
                 index += 1
             elif tokens[index].value == '*':
-                if tokens[index+1].typ == 'ID':
-                    self.CRVL(index+1)
-                elif tokens[index+1].typ == 'NUMBER':
-                    self.CRCTI(index+1)
+                if tokens[index + 1].typ == 'ID':
+                    self.CRVL(index + 1)
+                elif tokens[index + 1].typ == 'NUMBER':
+                    self.CRCTI(index + 1)
                 self.code.append("MULT \n")
                 index += 2
             elif tokens[index].value == '/':
-                if tokens[index+1].typ == 'ID':
-                    self.CRVL(index+1)
-                elif tokens[index+1].typ == 'NUMBER':
-                    self.CRCTI(index+1)
+                if tokens[index + 1].typ == 'ID':
+                    self.CRVL(index + 1)
+                elif tokens[index + 1].typ == 'NUMBER':
+                    self.CRCTI(index + 1)
                 self.code.append("DIVI \n")
                 index += 2
             elif tokens[index].typ == 'VIR':
                 break
         while len(pilha) != 1:
             self.code.append(pilha.pop())
+
 
 ##############################    MEPA     #################################################
 class Mepa():
@@ -358,6 +373,11 @@ if __name__ == "__main__":
     tradutor = Translator()
     mepa = Mepa()
     toke = lexico.tokenize(code)
+
+    with open('tokens_list.txt', 'w') as file:
+        for el in toke:
+            file.writelines(str(el) + "\n")
+
 
     texto = tradutor.translate(toke, 0, len(toke))
     print(texto)
