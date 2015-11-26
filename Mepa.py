@@ -68,6 +68,7 @@ class Translator():
         self.code = []
         self.tok = None
         self.text = ""
+        self.qtdevar = 0
 
     def translate(self, tokens, start, end):
         i = start
@@ -211,8 +212,10 @@ class Translator():
             i += 1
 
         if i == len(tokens):
+            self.DMEM()
             for line in self.code:
                 self.text += line
+
             self.text += 'PARA'
             return self.text
 
@@ -225,10 +228,12 @@ class Translator():
         while self.tokens[i].typ != 'BEGIN':
             if self.tokens[i].typ == 'ID':
                 self.var[self.tokens[i].value] = 0
-                count += 1
+                self.qtdevar += 1
             i += 1
-        self.code.append('AMEM ' + str(count) + "\n")
+        self.code.append('AMEM ' + str(self.qtdevar) + "\n")
         return i
+    def DMEM(self):
+        self.code.append('DMEM ' + str(self.qtdevar) + "\n")
 
     def LEIT(self, index):
         self.code.append("LEIT \n")
